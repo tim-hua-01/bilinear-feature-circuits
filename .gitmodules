@@ -1,3 +1,6 @@
 [submodule "dictionary_learning"]
 	path = dictionary_learning
 	url = https://github.com/saprmarks/dictionary_learning.git
+[submodule "bilinear-decomposition-v0-fork"]
+	path = bilinear-decomposition-v0-fork
+	url = https://github.com/tim-hua-01/bilinear-decomposition-v0-fork.git
