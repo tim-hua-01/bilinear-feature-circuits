@@ -1,0 +1,72 @@
+Collecting datasets
+  Downloading datasets-3.2.0-py3-none-any.whl.metadata (20 kB)
+Requirement already satisfied: filelock in /opt/conda/lib/python3.11/site-packages (from datasets) (3.16.1)
+Requirement already satisfied: numpy>=1.17 in /opt/conda/lib/python3.11/site-packages (from datasets) (1.26.4)
+Collecting pyarrow>=15.0.0 (from datasets)
+  Downloading pyarrow-18.1.0-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (3.3 kB)
+Collecting dill<0.3.9,>=0.3.0 (from datasets)
+  Downloading dill-0.3.8-py3-none-any.whl.metadata (10 kB)
+Collecting pandas (from datasets)
+  Downloading pandas-2.2.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (89 kB)
+Requirement already satisfied: requests>=2.32.2 in /opt/conda/lib/python3.11/site-packages (from datasets) (2.32.3)
+Requirement already satisfied: tqdm>=4.66.3 in /opt/conda/lib/python3.11/site-packages (from datasets) (4.66.5)
+Collecting xxhash (from datasets)
+  Downloading xxhash-3.5.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (12 kB)
+Collecting multiprocess<0.70.17 (from datasets)
+  Downloading multiprocess-0.70.16-py311-none-any.whl.metadata (7.2 kB)
+Collecting fsspec<=2024.9.0,>=2023.1.0 (from fsspec[http]<=2024.9.0,>=2023.1.0->datasets)
+  Downloading fsspec-2024.9.0-py3-none-any.whl.metadata (11 kB)
+Collecting aiohttp (from datasets)
+  Downloading aiohttp-3.11.10-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+Collecting huggingface-hub>=0.23.0 (from datasets)
+  Downloading huggingface_hub-0.26.5-py3-none-any.whl.metadata (13 kB)
+Requirement already satisfied: packaging in /opt/conda/lib/python3.11/site-packages (from datasets) (24.1)
+Requirement already satisfied: pyyaml>=5.1 in /opt/conda/lib/python3.11/site-packages (from datasets) (6.0.2)
+Collecting aiohappyeyeballs>=2.3.0 (from aiohttp->datasets)
+  Downloading aiohappyeyeballs-2.4.4-py3-none-any.whl.metadata (6.1 kB)
+Collecting aiosignal>=1.1.2 (from aiohttp->datasets)
+  Downloading aiosignal-1.3.1-py3-none-any.whl.metadata (4.0 kB)
+Requirement already satisfied: attrs>=17.3.0 in /opt/conda/lib/python3.11/site-packages (from aiohttp->datasets) (24.2.0)
+Collecting frozenlist>=1.1.1 (from aiohttp->datasets)
+  Downloading frozenlist-1.5.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (13 kB)
+Collecting multidict<7.0,>=4.5 (from aiohttp->datasets)
+  Downloading multidict-6.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.0 kB)
+Collecting propcache>=0.2.0 (from aiohttp->datasets)
+  Downloading propcache-0.2.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.2 kB)
+Collecting yarl<2.0,>=1.17.0 (from aiohttp->datasets)
+  Downloading yarl-1.18.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (69 kB)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in /opt/conda/lib/python3.11/site-packages (from huggingface-hub>=0.23.0->datasets) (4.12.2)
+Requirement already satisfied: charset-normalizer<4,>=2 in /opt/conda/lib/python3.11/site-packages (from requests>=2.32.2->datasets) (3.4.0)
+Requirement already satisfied: idna<4,>=2.5 in /opt/conda/lib/python3.11/site-packages (from requests>=2.32.2->datasets) (3.10)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/conda/lib/python3.11/site-packages (from requests>=2.32.2->datasets) (2.2.3)
+Requirement already satisfied: certifi>=2017.4.17 in /opt/conda/lib/python3.11/site-packages (from requests>=2.32.2->datasets) (2024.8.30)
+Requirement already satisfied: python-dateutil>=2.8.2 in /opt/conda/lib/python3.11/site-packages (from pandas->datasets) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /opt/conda/lib/python3.11/site-packages (from pandas->datasets) (2024.2)
+Collecting tzdata>=2022.7 (from pandas->datasets)
+  Downloading tzdata-2024.2-py2.py3-none-any.whl.metadata (1.4 kB)
+Requirement already satisfied: six>=1.5 in /opt/conda/lib/python3.11/site-packages (from python-dateutil>=2.8.2->pandas->datasets) (1.16.0)
+Downloading datasets-3.2.0-py3-none-any.whl (480 kB)
+Downloading dill-0.3.8-py3-none-any.whl (116 kB)
+Downloading fsspec-2024.9.0-py3-none-any.whl (179 kB)
+Downloading aiohttp-3.11.10-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.7 MB)
+[?25l   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m0.0/1.7 MB[0m [31m?[0m eta [36m-:--:--[0m[2K   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m1.7/1.7 MB[0m [31m35.4 MB/s[0m eta [36m0:00:00[0m
+[?25hDownloading huggingface_hub-0.26.5-py3-none-any.whl (447 kB)
+Downloading multiprocess-0.70.16-py311-none-any.whl (143 kB)
+Downloading pyarrow-18.1.0-cp311-cp311-manylinux_2_28_x86_64.whl (40.1 MB)
+[?25l   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m0.0/40.1 MB[0m [31m?[0m eta [36m-:--:--[0m[2K   [91m━━━━━━━━━━━━━━━━━━━━━━━━━[0m[91m╸[0m[90m━━━━━━━━━━━━━━[0m [32m25.7/40.1 MB[0m [31m129.0 MB/s[0m eta [36m0:00:01[0m[2K   [91m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[91m╸[0m [32m39.8/40.1 MB[0m [31m100.7 MB/s[0m eta [36m0:00:01[0m[2K   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m40.1/40.1 MB[0m [31m91.5 MB/s[0m eta [36m0:00:00[0m
+[?25hDownloading pandas-2.2.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.1 MB)
+[?25l   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m0.0/13.1 MB[0m [31m?[0m eta [36m-:--:--[0m[2K   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m13.1/13.1 MB[0m [31m87.0 MB/s[0m eta [36m0:00:00[0m
+[?25hDownloading xxhash-3.5.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (194 kB)
+Downloading aiohappyeyeballs-2.4.4-py3-none-any.whl (14 kB)
+Downloading aiosignal-1.3.1-py3-none-any.whl (7.6 kB)
+Downloading frozenlist-1.5.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (274 kB)
+Downloading multidict-6.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (129 kB)
+Downloading propcache-0.2.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (231 kB)
+Downloading tzdata-2024.2-py2.py3-none-any.whl (346 kB)
+Downloading yarl-1.18.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (344 kB)
+Installing collected packages: xxhash, tzdata, pyarrow, propcache, multidict, fsspec, frozenlist, dill, aiohappyeyeballs, yarl, pandas, multiprocess, huggingface-hub, aiosignal, aiohttp, datasets
+  Attempting uninstall: fsspec
+    Found existing installation: fsspec 2024.10.0
+    Uninstalling fsspec-2024.10.0:
+      Successfully uninstalled fsspec-2024.10.0
+Successfully installed aiohappyeyeballs-2.4.4 aiohttp-3.11.10 aiosignal-1.3.1 datasets-3.2.0 dill-0.3.8 frozenlist-1.5.0 fsspec-2024.9.0 huggingface-hub-0.26.5 multidict-6.1.0 multiprocess-0.70.16 pandas-2.2.3 propcache-0.2.1 pyarrow-18.1.0 tzdata-2024.2 xxhash-3.5.0 yarl-1.18.3

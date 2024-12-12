@@ -5,7 +5,7 @@ from numpy import ndindex
 from typing import Dict, Union
 from activation_utils import SparseAct
 
-DEBUGGING = False
+DEBUGGING = True
 
 if DEBUGGING:
     tracer_kwargs = {'validate' : True, 'scan' : True}
@@ -26,12 +26,13 @@ def _pe_attrib(
     
     # first run through a test input to figure out which hidden states are tuples
     is_tuple = {}
-    with model.trace("_"):
+    with model.trace("_", **tracer_kwargs):
         for submodule in submodules:
             is_tuple[submodule] = type(submodule.output.shape) == tuple
 
     hidden_states_clean = {}
     grads = {}
+    print('\nInitial trace\n')
     with model.trace(clean, **tracer_kwargs):
         for submodule in submodules:
             dictionary = dictionaries[submodule]
@@ -53,7 +54,8 @@ def _pe_attrib(
         metric_clean.sum().backward()
     hidden_states_clean = {k : v.value for k, v in hidden_states_clean.items()}
     grads = {k : v.value for k, v in grads.items()}
-
+    t.cuda.empty_cache()
+    print('\nPatching part\n')
     if patch is None:
         hidden_states_patch = {
             k : SparseAct(act=t.zeros_like(v.act), res=t.zeros_like(v.res)) for k, v in hidden_states_clean.items()
@@ -99,12 +101,14 @@ def _pe_ig(
 ):
     
     # first run through a test input to figure out which hidden states are tuples
+    print('\nIntegrated Gradient estimation\n')
     is_tuple = {}
-    with model.trace("_"):
+    with model.trace("_", **tracer_kwargs):
         for submodule in submodules:
             is_tuple[submodule] = type(submodule.output.shape) == tuple
 
     hidden_states_clean = {}
+    print('\nInitial trace\n')
     with model.trace(clean, **tracer_kwargs), t.no_grad():
         for submodule in submodules:
             dictionary = dictionaries[submodule]
@@ -118,6 +122,8 @@ def _pe_ig(
         metric_clean = metric_fn(model, **metric_kwargs).save()
     hidden_states_clean = {k : v.value for k, v in hidden_states_clean.items()}
 
+    t.cuda.empty_cache()
+    print('\nPatching part\n')
     if patch is None:
         hidden_states_patch = {
             k : SparseAct(act=t.zeros_like(v.act), res=t.zeros_like(v.res)) for k, v in hidden_states_clean.items()
