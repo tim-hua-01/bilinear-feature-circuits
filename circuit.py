@@ -96,6 +96,7 @@ def get_circuit(
         node_threshold=0.1,
         edge_threshold=0.01,
 ):
+    t.cuda.empty_cache()
     all_submods = [embed] + [submod for layer_submods in zip(mlps, attns, resids) for submod in layer_submods]
     
     # first get the patching effect of everything on y
@@ -210,6 +211,7 @@ def get_circuit(
             edges['embed'][f'resid_0'] = RR_effect - RMR_effect - RAR_effect
 
     # rearrange weight matrices
+    t.cuda.empty_cache()
     for child in edges:
         # get shape for child
         bc, sc, fc = nodes[child].act.shape
@@ -222,7 +224,7 @@ def get_circuit(
                 assert bp == bc
                 weight_matrix = sparse_reshape(weight_matrix, (bp, sp, fp+1, bc, sc, fc+1))
             edges[child][parent] = weight_matrix
-    
+    t.cuda.empty_cache()
     if aggregation == 'sum':
         # aggregate across sequence position
         for child in edges:
@@ -275,7 +277,7 @@ def get_circuit(
 
     else:
         raise ValueError(f"Unknown aggregation: {aggregation}")
-
+    t.cuda.empty_cache()
     return nodes, edges
 
 
