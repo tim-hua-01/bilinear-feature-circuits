@@ -152,13 +152,15 @@ def get_circuit(
             return_without_right=True,
         )
 
-
+    #print(f"Upstream deltas{deltas}")
     # now we work backward through the model to get the edges
+    print('Edges time')
     for layer in reversed(range(len(resids))):
+        print(f'\nAt layer {layer}\n')
         resid = resids[layer]
         mlp = mlps[layer]
         attn = attns[layer]
-
+        
         MR_effect, MR_grad = N(mlp, resid)
         AR_effect, AR_grad = N(attn, resid)
 
