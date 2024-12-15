@@ -5,6 +5,7 @@ from numpy import ndindex
 from typing import Dict, Union
 from activation_utils import SparseAct
 from torch.fx.experimental.symbolic_shapes import guard_size_oblivious
+import gc
 DEBUGGING = True
 
 if DEBUGGING:
