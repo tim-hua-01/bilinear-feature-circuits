@@ -356,7 +356,7 @@ def jvp(
         try:
             getrepr = right_vec.__repr__()
         except:
-            print('right vec is wrong')
+            #print('right vec is wrong')
             rightvecright = False
         for downstream_feat in downstream_features:
             if not rightvecright:
@@ -384,6 +384,8 @@ def jvp(
                 jv_indices[downstream_feat] = jv.nonzero().squeeze(-1).save()
                 jv_values[downstream_feat] = jv[vjv_indices[downstream_feat]].save()
             vjv = vjv.save()
+            t.cuda.empty_cache()
+            gc.collect()
 
     if DEBUGGING:
         tracer_kwargs = {'validate' : True, 'scan' : True}
@@ -402,7 +404,8 @@ def jvp(
          t.cat([vjv_indices[downstream_feat].value for downstream_feat in downstream_features], dim=0)]
     ).to(model.device)
     vjv_values = t.cat([vjv_values[downstream_feat].value for downstream_feat in downstream_features], dim=0)
-
+    t.cuda.empty_cache()
+    gc.collect()
     if not return_without_right:
         return t.sparse_coo_tensor(vjv_indices, vjv_values, (d_downstream_contracted, d_upstream_contracted))
 
