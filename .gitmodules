@@ -1,3 +1,6 @@
 [submodule "dictionary_learning"]
 	path = dictionary_learning
 	url = https://github.com/saprmarks/dictionary_learning.git
+[submodule "bilinear_interp_tim"]
+	path = bilinear_interp_tim
+	url = https://github.com/tim-hua-01/bilinear_interp_tim.git
