@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/bilinear_interp_tim"
+    ],
+    "python.defaultInterpreterPath": "/Users/timhua/anaconda3/envs/arena/bin/python",
+}
