@@ -1,10 +1,12 @@
+import os
+import sys
+parent_dir = os.path.abspath('.')
+sys.path.append(parent_dir + '/bilinear_interp_tim')
 import argparse
 import gc
 import json
 import math
-import os
 from collections import defaultdict
-from sae import SAE
 import torch as t
 from einops import rearrange
 from tqdm import tqdm
@@ -464,7 +466,7 @@ if __name__ == '__main__':
 
 
     device = args.device
-    model = Transformer.from_pretrained(args.model, device = 'device')
+    model = Transformer.from_pretrained(args.model, device = args.device)
     model = Sight(model)
     embed = model._envoy.transformer.wte
     attns = [layer.attn for layer in model._envoy.transformer.h]
@@ -480,11 +482,11 @@ if __name__ == '__main__':
             dictionaries[mlps[i]] = IdentityDict(args.d_model)
             dictionaries[resids[i]] = IdentityDict(args.d_model)
     else:
-        dictionaries[embed] = DictionarySAE.from_pretrained(repo_id_or_model = {args.dict_path}, point = ('resid-pre',0), expansion = 8, k = 5) 
+        dictionaries[embed] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('resid-pre',0), expansion = 8, k = 5) 
         for i in range(len(model._envoy.transformer.h)):
-            dictionaries[attns[i]] = DictionarySAE.from_pretrained(repo_id_or_model = {args.dict_path}, point = ('attn-out',i), expansion = 8, k = 30).to(device = device)
-            dictionaries[mlps[i]] = DictionarySAE.from_pretrained(repo_id_or_model = {args.dict_path}, point = ('mlp-out',i), expansion = 8, k = 30).to(device = device)
-            dictionaries[resids[i]] = DictionarySAE.from_pretrained(repo_id_or_model = {args.dict_path}, point = ('resid-post',i), expansion = 8, k = 30).to(device = device)
+            dictionaries[attns[i]] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('attn-out',i), expansion = 8, k = 30).to(device = device)
+            dictionaries[mlps[i]] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('mlp-out',i), expansion = 8, k = 30).to(device = device)
+            dictionaries[resids[i]] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('resid-post',i), expansion = 8, k = 30).to(device = device)
         
         if args.nopair:
             save_basename = os.path.splitext(os.path.basename(args.dataset))[0]
