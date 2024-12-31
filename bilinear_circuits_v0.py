@@ -424,7 +424,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', '-d', type=str, default='simple_train',
                         help="A subject-verb agreement dataset in data/, or a path to a cluster .json.")
-    parser.add_argument('--num_examples', '-n', type=int, default=10,
+    parser.add_argument('--num_examples', '-n', type=int, default=20,
                         help="The number of examples from the --dataset over which to average indirect effects.")
     parser.add_argument('--example_length', '-l', type=int, default=None,
                         help="The max length (if using sum aggregation) or exact length (if not aggregating) of examples.")
@@ -438,7 +438,7 @@ if __name__ == '__main__':
                         help="ID of the dictionaries. Use `id` to obtain circuits on neurons/heads directly.")
     parser.add_argument('--dict_size', type=int, default=32768,
                         help="The width of the dictionary encoder.")
-    parser.add_argument('--batch_size', type=int, default=32,
+    parser.add_argument('--batch_size', type=int, default=4,
                         help="Number of examples to process at once when running circuit discovery.")
     parser.add_argument('--aggregation', type=str, default='sum',
                         help="Aggregation across token positions. Should be one of `sum` or `none`.")
@@ -482,7 +482,7 @@ if __name__ == '__main__':
             dictionaries[mlps[i]] = IdentityDict(args.d_model)
             dictionaries[resids[i]] = IdentityDict(args.d_model)
     else:
-        dictionaries[embed] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('resid-pre',0), expansion = 8, k = 5) 
+        dictionaries[embed] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('resid-pre',0), expansion = 8, k = 5).to(device = device) 
         for i in range(len(model._envoy.transformer.h)):
             dictionaries[attns[i]] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('attn-out',i), expansion = 8, k = 30).to(device = device)
             dictionaries[mlps[i]] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('mlp-out',i), expansion = 8, k = 30).to(device = device)
@@ -495,7 +495,8 @@ if __name__ == '__main__':
             data_path = f"data/{args.dataset}.json"
             save_basename = args.dataset
             if args.aggregation == "sum":
-                examples = load_examples(data_path, args.num_examples, model, pad_to_length=args.example_length)
+                examples = load_examples(data_path, args.num_examples, model, length=args.example_length)
+                #examples = load_examples(data_path, args.num_examples, model, pad_to_length=args.example_length)
             else:
                 examples = load_examples(data_path, args.num_examples, model, length=args.example_length)
     
@@ -522,7 +523,7 @@ if __name__ == '__main__':
                 def metric_fn(model):
                     return (
                         -1 * t.gather(
-                            t.nn.functional.log_softmax(model.embed_out.output[:,-1,:], dim=-1), dim=-1, index=clean_answer_idxs.view(-1, 1)
+                            t.nn.functional.log_softmax(model.lm_head.output[:,-1,:], dim=-1), dim=-1, index=clean_answer_idxs.view(-1, 1)
                         ).squeeze(-1)
                     )
             else:
@@ -530,8 +531,8 @@ if __name__ == '__main__':
                 patch_answer_idxs = t.tensor([e['patch_answer'] for e in batch], dtype=t.long, device=device)
                 def metric_fn(model):
                     return (
-                        t.gather(model.embed_out.output[:,-1,:], dim=-1, index=patch_answer_idxs.view(-1, 1)).squeeze(-1) - \
-                        t.gather(model.embed_out.output[:,-1,:], dim=-1, index=clean_answer_idxs.view(-1, 1)).squeeze(-1)
+                        t.gather(model.lm_head.output[:,-1,:], dim=-1, index=patch_answer_idxs.view(-1, 1)).squeeze(-1) - \
+                        t.gather(model.lm_head.output[:,-1,:], dim=-1, index=clean_answer_idxs.view(-1, 1)).squeeze(-1)
                     )
             
             nodes, edges = get_circuit(

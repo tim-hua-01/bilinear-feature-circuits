@@ -18,7 +18,7 @@ class DictionaryCfg():
         self.size = dictionary_size
 
 
-def load_examples(dataset, num_examples, model, seed=12, pad_to_length=None, length=None):
+def load_examples(dataset, num_examples, model, seed=12, pad_to_length=None, length=None, device = 'cuda'):
     examples = []
     dataset_items = open(dataset).readlines()
     random.seed(seed)
@@ -26,18 +26,27 @@ def load_examples(dataset, num_examples, model, seed=12, pad_to_length=None, len
     for line in dataset_items:
         data = json.loads(line)
         clean_prefix = model.tokenizer(data["clean_prefix"], return_tensors="pt",
-                                        padding=False).input_ids
+                                        padding=False).input_ids.to(device = device)
         patch_prefix = model.tokenizer(data["patch_prefix"], return_tensors="pt",
-                                        padding=False).input_ids
-        clean_answer = model.tokenizer(data["clean_answer"], return_tensors="pt",
-                                        padding=False).input_ids
-        patch_answer = model.tokenizer(data["patch_answer"], return_tensors="pt",
-                                        padding=False).input_ids
-        # only keep examples where answers are single tokens
-        if clean_prefix.shape[1] != patch_prefix.shape[1]:
-            continue
+                                        padding=False).input_ids.to(device = device)
+        if 'mistral-community/Mixtral-8x22B-v0.1' == model.tokenizer.name_or_path: 
+            clean_answer = model.tokenizer(data["clean_answer"].strip(), return_tensors="pt", #quirk with the mistral tokenizer
+                                            padding=False, add_special_tokens = False).input_ids.to(device = device)
+            patch_answer = model.tokenizer(data["patch_answer"].strip(), return_tensors="pt",
+                                            padding=False, add_special_tokens = False).input_ids.to(device = device)
+        else:
+            clean_answer = model.tokenizer(data["clean_answer"], return_tensors="pt", 
+                                            padding=False, add_special_tokens = False).input_ids.to(device = device)
+            patch_answer = model.tokenizer(data["patch_answer"], return_tensors="pt",
+                                            padding=False).input_ids.to(device = device)
+        
         # only keep examples where clean and patch inputs are the same length
+        if clean_prefix.shape[1] != patch_prefix.shape[1]:
+            print(f"Clean and patch inputs of different shapes.\nClean: {clean_prefix.shape[1]} Patch: {patch_prefix.shape[1]}")
+            continue
+        # only keep examples where answers are single tokens
         if clean_answer.shape[1] != 1 or patch_answer.shape[1] != 1:
+            print(f"Answer shape more than one token.\nClean: {clean_answer.shape[1]} Patch: {patch_answer.shape[1]}")
             continue
         # if we specify a `length`, filter examples if they don't match
         if length and clean_prefix.shape[1] != length:
