@@ -1,4 +1,5 @@
-from graphviz import Digraph
+# %%
+from graphviz import Digraph, Source
 from collections import defaultdict
 import re
 import os
@@ -334,3 +335,13 @@ def plot_circuit_posaligned(nodes, edges, layers=6, length=6, example_text="The 
     if not os.path.exists(os.path.dirname(save_dir)):
         os.makedirs(os.path.dirname(save_dir))
     G.render(save_dir, format='png', cleanup=True)
+# %%
+
+def plot_from_file(filename):
+    # Read the file
+    with open(filename, 'r') as file:
+        dot_content = file.read()
+
+    # Create and display the graph
+    graph = Source(dot_content)
+    graph.view() 
