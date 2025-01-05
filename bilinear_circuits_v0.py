@@ -19,6 +19,7 @@ from loading_utils import load_examples, load_examples_nopair
 from nnsight import LanguageModel
 from language import Transformer, Sight
 from sae_adopter import DictionarySAE
+from dictionary_learning.dictionary import IdentityDict
 
 
 ###### utilities for dealing with sparse COO tensors ######
@@ -420,6 +421,106 @@ def get_circuit_cluster(dataset,
 
 
 
+
+import os
+import math
+
+def initialize_model_and_dictionaries(
+    device: str,
+    model_name: str,
+    dict_id: str | int,
+    d_model: int,
+    dict_path: str,
+    dataset: str,
+    num_examples: int,
+    example_length: int,
+    batch_size: int,
+    aggregation: str,
+    nopair: bool,
+):
+    """
+    Initializes a transformer model, associated dictionaries, and data batches.
+
+    Args:
+        device: The device to run on (e.g., "cuda" or "cpu").
+        model_name: The name of the pre-trained transformer model.
+        dict_id: The type of dictionary ('id' for identity, otherwise uses DictionarySAE).
+        d_model: The dimensionality of the model's embeddings.
+        dict_path: Path to pre-trained dictionaries if dict_id is not 'id'.
+        dataset: The name of the dataset to load examples from.
+        num_examples: The number of examples to load.
+        example_length: The length of each example sequence.
+        batch_size: The batch size for processing examples.
+        aggregation: The type of example loading ('sum' uses load_examples, otherwise another method).
+        nopair: Whether to use load_examples_nopair.
+
+    Returns:
+        A tuple containing variables mirroring the original code's state:
+        - device: The device being used.
+        - model: The initialized Transformer model.
+        - embed: The model's embedding layer.
+        - attns: A list of attention layers.
+        - mlps: A list of MLP layers.
+        - resids: A list of residual connections.
+        - dictionaries: A dictionary mapping layers to their corresponding dictionaries.
+        - save_basename: The base name for saving files (derived from the dataset).
+        - examples: The loaded data examples.
+        - batch_size: The batch size used.
+        - num_examples: The actual number of examples used.
+        - n_batches: The number of batches.
+        - batches: A list of data batches.
+
+    """
+
+    model = Transformer.from_pretrained(model_name, device=device)
+    model = Sight(model)
+    embed = model._envoy.transformer.wte
+    attns = [layer.attn for layer in model._envoy.transformer.h]
+    mlps = [layer.mlp for layer in model._envoy.transformer.h]
+    resids = [layer for layer in model._envoy.transformer.h]
+
+    dictionaries = {}
+    if dict_id == 'id':
+        dictionaries[embed] = IdentityDict(d_model)
+        for i in range(len(model._envoy.transformer.h)):
+            dictionaries[attns[i]] = IdentityDict(d_model)
+            dictionaries[mlps[i]] = IdentityDict(d_model)
+            dictionaries[resids[i]] = IdentityDict(d_model)
+    else:
+        dictionaries[embed] = DictionarySAE.from_pretrained(
+            repo_id_or_model=dict_path, point=('resid-pre', 0), expansion=8, k=5
+        ).to(device=device)
+        for i in range(len(model._envoy.transformer.h)):
+            dictionaries[attns[i]] = DictionarySAE.from_pretrained(
+                repo_id_or_model=dict_path, point=('attn-out', i), expansion=8, k=30
+            ).to(device=device)
+            dictionaries[mlps[i]] = DictionarySAE.from_pretrained(
+                repo_id_or_model=dict_path, point=('mlp-out', i), expansion=8, k=30
+            ).to(device=device)
+            dictionaries[resids[i]] = DictionarySAE.from_pretrained(
+                repo_id_or_model=dict_path, point=('resid-post', i), expansion=8, k=30
+            ).to(device=device)
+
+    if nopair:
+        save_basename = os.path.splitext(os.path.basename(dataset))[0]
+        examples = load_examples_nopair(dataset, num_examples, model, length=example_length)
+    else:
+        data_path = f"data/{dataset}.json"
+        save_basename = dataset
+        if aggregation == "sum":
+            examples = load_examples(data_path, num_examples, model, length=example_length)
+        else:
+            examples = load_examples(data_path, num_examples, model, length=example_length)
+
+    num_examples = min([num_examples, len(examples)])
+    n_batches = math.ceil(num_examples / batch_size)
+    batches = [
+        examples[batch * batch_size : (batch + 1) * batch_size]
+        for batch in range(n_batches)
+    ]
+
+    return device, model, embed, attns, mlps, resids, dictionaries, save_basename, examples, batch_size, num_examples, n_batches, batches
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', '-d', type=str, default='simple_train',
@@ -465,47 +566,20 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    device = args.device
-    model = Transformer.from_pretrained(args.model, device = args.device)
-    model = Sight(model)
-    embed = model._envoy.transformer.wte
-    attns = [layer.attn for layer in model._envoy.transformer.h]
-    mlps = [layer.mlp for layer in model._envoy.transformer.h]
-    resids = [layer for layer in model._envoy.transformer.h]
-
-    dictionaries = {}
-    if args.dict_id == 'id':
-        from dictionary_learning.dictionary import IdentityDict
-        dictionaries[embed] = IdentityDict(args.d_model)
-        for i in range(len(model._envoy.transformer.h)):
-            dictionaries[attns[i]] = IdentityDict(args.d_model)
-            dictionaries[mlps[i]] = IdentityDict(args.d_model)
-            dictionaries[resids[i]] = IdentityDict(args.d_model)
-    else:
-        dictionaries[embed] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('resid-pre',0), expansion = 8, k = 5).to(device = device) 
-        for i in range(len(model._envoy.transformer.h)):
-            dictionaries[attns[i]] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('attn-out',i), expansion = 8, k = 30).to(device = device)
-            dictionaries[mlps[i]] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('mlp-out',i), expansion = 8, k = 30).to(device = device)
-            dictionaries[resids[i]] = DictionarySAE.from_pretrained(repo_id_or_model = args.dict_path, point = ('resid-post',i), expansion = 8, k = 30).to(device = device)
-        
-        if args.nopair:
-            save_basename = os.path.splitext(os.path.basename(args.dataset))[0]
-            examples = load_examples_nopair(args.dataset, args.num_examples, model, length=args.example_length)
-        else:
-            data_path = f"data/{args.dataset}.json"
-            save_basename = args.dataset
-            if args.aggregation == "sum":
-                examples = load_examples(data_path, args.num_examples, model, length=args.example_length)
-                #examples = load_examples(data_path, args.num_examples, model, pad_to_length=args.example_length)
-            else:
-                examples = load_examples(data_path, args.num_examples, model, length=args.example_length)
+    device, model, embed, attns, mlps, resids, dictionaries, save_basename, examples, batch_size, num_examples, n_batches, batches = initialize_model_and_dictionaries(
+    device=args.device,
+    model_name=args.model,
+    dict_id=args.dict_id,
+    d_model=args.d_model,
+    dict_path=args.dict_path,
+    dataset=args.dataset,
+    num_examples=args.num_examples,
+    example_length=args.example_length,
+    batch_size=args.batch_size,
+    aggregation=args.aggregation,
+    nopair=args.nopair,
+)
     
-    batch_size = args.batch_size
-    num_examples = min([args.num_examples, len(examples)])
-    n_batches = math.ceil(num_examples / batch_size)
-    batches = [
-        examples[batch*batch_size:(batch+1)*batch_size] for batch in range(n_batches)
-    ]
     if num_examples < args.num_examples: # warn the user
         print(f"Total number of examples is less than {args.num_examples}. Using {num_examples} examples instead.")
 

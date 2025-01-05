@@ -4,4 +4,15 @@
         "${workspaceFolder}/bilinear_interp_tim"
     ],
     "python.defaultInterpreterPath": "/Users/timhua/anaconda3/envs/arena/bin/python",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.importFormat": "absolute",
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingTypeStubs": "information"
+    },
+    "editor.inlayHints.enabled": "on"
 }
