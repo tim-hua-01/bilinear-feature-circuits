@@ -3,7 +3,7 @@
         "${workspaceFolder}",
         "${workspaceFolder}/bilinear_interp_tim"
     ],
-    "python.defaultInterpreterPath": "/Users/timhua/anaconda3/envs/arena/bin/python",
+    "python.defaultInterpreterPath": "/opt/conda/bin/python",
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.diagnosticMode": "workspace",
     "python.analysis.autoImportCompletions": true,
