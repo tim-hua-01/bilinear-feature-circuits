@@ -1,7 +1,8 @@
 {
     "python.analysis.extraPaths": [
         "${workspaceFolder}",
-        "${workspaceFolder}/bilinear_interp_tim"
+        "${workspaceFolder}/bilinear_interp_tim",
+        "${workspaceFolder}/dictionary_learning"
     ],
     "python.defaultInterpreterPath": "/Users/timhua/anaconda3/envs/arena/bin/python",
     "python.analysis.typeCheckingMode": "basic",
