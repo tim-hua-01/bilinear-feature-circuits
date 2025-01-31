@@ -169,7 +169,7 @@ def _pe_ig(
                         submodule.output = dictionary.decode(f.act) + f.res
                     metrics.append(metric_fn(model, **metric_kwargs))
             metric = sum([m for m in metrics])
-            metric.sum().backward(retain_graph=True) # TODO : why is this necessary? Probably shouldn't be, contact jaden
+            metric.sum().backward(retain_graph=True)
 
         mean_grad = sum([f.act.grad for f in fs]) / steps
         mean_residual_grad = sum([f.res.grad for f in fs]) / steps
