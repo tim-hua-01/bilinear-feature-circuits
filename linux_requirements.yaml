@@ -137,7 +137,7 @@ dependencies:
       - narwhals==1.24.1
       - nest-asyncio==1.6.0
       - networkx==3.3
-      - nnsight==0.4.0
+      - nnsight==0.3.7
       - numpy==2.1.2
       - nvidia-cublas-cu11==11.11.3.6
       - nvidia-cuda-cupti-cu11==11.8.87
