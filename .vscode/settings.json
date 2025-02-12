@@ -15,5 +15,5 @@
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingTypeStubs": "information"
     },
-    "editor.inlayHints.enabled": "on"
+    "editor.inlayHints.enabled": "off"
 }
